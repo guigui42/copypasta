@@ -12,13 +12,15 @@ builds:
       - -s -w -X main.version={{.Version}}
 
 archives:
-  - format: tar.gz
+  - formats:
+      - tar.gz
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 
 brews:
   - repository:
       owner: guigui42
       name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     homepage: "https://github.com/guigui42/copypasta"
     description: "Clean dark-themed website text for pasting into Outlook/Word"
     license: "MIT"

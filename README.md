@@ -56,7 +56,25 @@ copypasta
 
 That's it. One command, no flags, no UI.
 
-## Raycast Integration (recommended)
+## macOS Quick Action (no third-party app)
+
+Create a system-wide keyboard shortcut using macOS Automator — no Raycast or other apps needed:
+
+1. Install the Quick Action:
+
+```bash
+copypasta --install
+```
+
+2. Assign a keyboard shortcut:
+   - **System Settings → Keyboard → Keyboard Shortcuts → Services → General**
+   - Find **Clean Clipboard**, click "Add Shortcut", press your combo (e.g. `⌃⌥⌘V`)
+
+**Workflow:** Copy → press hotkey → Paste clean.
+
+> **Note:** The first time you use the shortcut, macOS may ask for Accessibility permissions — grant them.
+
+## Raycast Integration
 
 For a seamless one-keystroke workflow, add a Raycast script command:
 

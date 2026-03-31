@@ -29,6 +29,14 @@ The tool reads your clipboard (including the hidden HTML), strips dark backgroun
 
 ## Installation
 
+### Homebrew (recommended)
+
+```bash
+brew install guigui42/tap/copypasta
+```
+
+### From source
+
 ```bash
 # Clone and build
 git clone https://github.com/guigui42/copypasta.git

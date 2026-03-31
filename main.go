@@ -80,12 +80,22 @@ func installQuickAction() error {
 			</dict>
 			<key>NSMessage</key>
 			<string>runWorkflowAsService</string>
+			<key>NSRequiredContext</key>
+			<dict/>
+			<key>NSSendTypes</key>
+			<array/>
+			<key>NSReturnTypes</key>
+			<array/>
 		</dict>
 	</array>
 </dict>
 </plist>`
 
-	command := exe + " 2>&1 || true"
+	// XML-escape the path for safe embedding in the plist
+	xmlExe := strings.ReplaceAll(exe, "&", "&amp;")
+	xmlExe = strings.ReplaceAll(xmlExe, "<", "&lt;")
+	xmlExe = strings.ReplaceAll(xmlExe, ">", "&gt;")
+	command := xmlExe + " 2&gt;&amp;1 || true"
 	documentWflow := `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -180,6 +190,22 @@ func installQuickAction() error {
 	<dict/>
 	<key>workflowMetaData</key>
 	<dict>
+		<key>inputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>outputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>presentationMode</key>
+		<integer>15</integer>
+		<key>processesInput</key>
+		<integer>0</integer>
+		<key>serviceInputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>serviceOutputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>serviceProcessesInput</key>
+		<integer>0</integer>
+		<key>useAutomaticInputType</key>
+		<integer>0</integer>
 		<key>workflowTypeIdentifier</key>
 		<string>com.apple.Automator.servicesMenu</string>
 	</dict>

@@ -87,7 +87,7 @@ func cleanAttributes(n *html.Node) {
 		case "colspan", "rowspan":
 			// Keep table structure
 			cleaned = append(cleaned, attr)
-		// Drop: class, id, data-*, bgcolor, color, width, height on non-img, etc.
+			// Drop: class, id, data-*, bgcolor, color, width, height on non-img, etc.
 		}
 	}
 	n.Attr = cleaned
@@ -110,7 +110,7 @@ func sanitizeStyle(style string) string {
 }
 
 // stripStandaloneEmoji removes emoji characters that appear alone (not within text).
-var emojiRe = regexp.MustCompile(`^[\s]*[\x{1F300}-\x{1FAF8}\x{2600}-\x{27BF}\x{FE00}-\x{FE0F}\x{200D}\x{20E3}\x{E0020}-\x{E007F}✅❌⚠📷🔗💡🎯🚀✓✔☑☐📌📝🔒🔑]+[\s]*$`)
+var emojiRe = regexp.MustCompile(`^[\s]*[\x{1F300}-\x{1FAF8}\x{2600}-\x{27BF}\x{FE00}-\x{FE0F}\x{200D}\x{20E3}\x{E0020}-\x{E007F}✅❌⚠📷🔗💡🎯🚀✓✔☑☐📌📝🔒🔑📘]+[\s]*$`)
 
 func stripStandaloneEmoji(s string) string {
 	if emojiRe.MatchString(s) {

@@ -11,12 +11,21 @@ import (
 )
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "--install" {
-		if err := installQuickAction(); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "--install":
+			if err := installQuickAction(); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
+		case "--install-raycast":
+			if err := installRaycast(); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+				os.Exit(1)
+			}
+			return
 		}
-		return
 	}
 
 	plainText, _ := clipboard.Read()
@@ -224,5 +233,50 @@ func installQuickAction() error {
 	fmt.Println("Next step — assign a keyboard shortcut:")
 	fmt.Println("  System Settings → Keyboard → Keyboard Shortcuts → Services → General")
 	fmt.Println("  Find \"Clean Clipboard\" and set your shortcut (e.g. ⌃⌥⌘V)")
+	return nil
+}
+
+func installRaycast() error {
+	exe, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("could not determine executable path: %w", err)
+	}
+	exe, err = filepath.EvalSymlinks(exe)
+	if err != nil {
+		return fmt.Errorf("could not resolve symlinks: %w", err)
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("could not determine home directory: %w", err)
+	}
+
+	scriptsDir := filepath.Join(home, "Documents", "raycast-scripts")
+	if err := os.MkdirAll(scriptsDir, 0755); err != nil {
+		return fmt.Errorf("could not create scripts directory: %w", err)
+	}
+
+	scriptPath := filepath.Join(scriptsDir, "copypasta.sh")
+	script := `#!/bin/bash
+
+# @raycast.schemaVersion 1
+# @raycast.title Clean Clipboard
+# @raycast.mode silent
+# @raycast.icon 🧹
+# @raycast.packageName Copypasta
+
+` + exe + `
+`
+
+	if err := os.WriteFile(scriptPath, []byte(script), 0755); err != nil {
+		return fmt.Errorf("could not write script: %w", err)
+	}
+
+	fmt.Println("✓ Raycast script installed: ~/Documents/raycast-scripts/copypasta.sh")
+	fmt.Println()
+	fmt.Println("Next step — add the script directory in Raycast:")
+	fmt.Println("  Raycast → Settings → Extensions → Script Commands → Add Script Directory")
+	fmt.Println("  Select ~/Documents/raycast-scripts")
+	fmt.Println("  Then assign a hotkey (e.g. ⌃⌥⌘V)")
 	return nil
 }

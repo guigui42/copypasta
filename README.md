@@ -76,25 +76,16 @@ copypasta --install
 
 ## Raycast Integration
 
-For a seamless one-keystroke workflow, add a Raycast script command:
+For a seamless one-keystroke workflow with [Raycast](https://raycast.com):
 
-1. Create `~/Documents/raycast-scripts/copypasta.sh`:
+1. Install the script command:
 
 ```bash
-#!/bin/bash
-
-# @raycast.schemaVersion 1
-# @raycast.title Clean Clipboard
-# @raycast.mode silent
-# @raycast.icon 🧹
-# @raycast.packageName Copypasta
-
-/path/to/copypasta
+copypasta --install-raycast
 ```
 
-2. `chmod +x ~/Documents/raycast-scripts/copypasta.sh`
-3. Raycast → Settings → Extensions → Script Commands → Add Script Directory → select `~/Documents/raycast-scripts`
-4. Assign a hotkey (e.g. `⌃⌥⌘V`)
+2. Raycast → Settings → Extensions → Script Commands → Add Script Directory → select `~/Documents/raycast-scripts`
+3. Assign a hotkey (e.g. `⌃⌥⌘V`)
 
 **Workflow:** Copy → press hotkey → Paste clean.
 

@@ -70,6 +70,17 @@ pb.setStringForType($("%s"), "public.utf8-plain-text");
 	return nil
 }
 
+// Paste simulates pressing Cmd+V via AppleScript to paste clipboard contents.
+func Paste() error {
+	cmd := exec.Command("osascript", "-e", `tell application "System Events" to keystroke "v" using command down`)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to simulate paste: %w (%s)", err, stderr.String())
+	}
+	return nil
+}
+
 // jsEscape escapes a string for embedding in a JavaScript string literal.
 func jsEscape(s string) string {
 	r := strings.NewReplacer(

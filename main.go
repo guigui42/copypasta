@@ -11,8 +11,9 @@ import (
 )
 
 func main() {
-	if len(os.Args) > 1 {
-		switch os.Args[1] {
+	paste := false
+	for _, arg := range os.Args[1:] {
+		switch arg {
 		case "--install":
 			if err := installQuickAction(); err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
@@ -25,6 +26,8 @@ func main() {
 				os.Exit(1)
 			}
 			return
+		case "--paste", "-p":
+			paste = true
 		}
 	}
 
@@ -51,7 +54,15 @@ func main() {
 		}
 	}
 
-	fmt.Println("✓ Cleaned text copied to clipboard!")
+	if paste {
+		if err := clipboard.Paste(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error pasting: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("✓ Cleaned and pasted!")
+	} else {
+		fmt.Println("✓ Cleaned text copied to clipboard!")
+	}
 }
 
 func installQuickAction() error {
@@ -104,7 +115,7 @@ func installQuickAction() error {
 	xmlExe := strings.ReplaceAll(exe, "&", "&amp;")
 	xmlExe = strings.ReplaceAll(xmlExe, "<", "&lt;")
 	xmlExe = strings.ReplaceAll(xmlExe, ">", "&gt;")
-	command := xmlExe + " 2&gt;&amp;1 || true"
+	command := xmlExe + " --paste 2&gt;&amp;1 || true"
 	documentWflow := `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -265,7 +276,7 @@ func installRaycast() error {
 # @raycast.icon 🧹
 # @raycast.packageName Copypasta
 
-` + exe + `
+` + exe + ` --paste
 `
 
 	if err := os.WriteFile(scriptPath, []byte(script), 0755); err != nil {

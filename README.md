@@ -54,7 +54,18 @@ copypasta
 # ✓ Cleaned text copied to clipboard!
 ```
 
-That's it. One command, no flags, no UI.
+### Auto-paste mode
+
+Use `--paste` (or `-p`) to clean the clipboard **and** immediately paste the result (simulates ⌘V):
+
+```bash
+copypasta --paste
+# ✓ Cleaned and pasted!
+```
+
+This is the default mode for macOS Quick Actions and Raycast scripts installed with `--install` / `--install-raycast`.
+
+That's it. One command, no UI.
 
 ## macOS Quick Action (no third-party app)
 
@@ -70,9 +81,9 @@ copypasta --install
    - **System Settings → Keyboard → Keyboard Shortcuts → Services → General**
    - Find **Clean Clipboard**, click "Add Shortcut", press your combo (e.g. `⌃⌥⌘V`)
 
-**Workflow:** Copy → press hotkey → Paste clean.
+**Workflow:** Copy → press hotkey → cleaned text is pasted automatically.
 
-> **Note:** The first time you use the shortcut, macOS may ask for Accessibility permissions — grant them.
+> **Note:** The first time you use the shortcut, macOS will ask for Accessibility permissions (needed to simulate ⌘V) — grant them.
 
 ## Raycast Integration
 
@@ -87,7 +98,7 @@ copypasta --install-raycast
 2. Raycast → Settings → Extensions → Script Commands → Add Script Directory → select `~/Documents/raycast-scripts`
 3. Assign a hotkey (e.g. `⌃⌥⌘V`)
 
-**Workflow:** Copy → press hotkey → Paste clean.
+**Workflow:** Copy → press hotkey → cleaned text is pasted automatically.
 
 ## License
 

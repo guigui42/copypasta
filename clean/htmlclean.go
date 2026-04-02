@@ -34,6 +34,11 @@ func sanitizeNode(n *html.Node) {
 	// Remove nodes that should be stripped entirely
 	if n.Type == html.ElementNode {
 		tag := strings.ToLower(n.Data)
+		if tag == "font" || tag == "big" || tag == "small" {
+			// Unwrap font/size-altering elements: keep children, remove the element itself
+			unwrapNode(n)
+			return
+		}
 		if tag == "style" || tag == "script" || tag == "noscript" || tag == "svg" || tag == "hr" {
 			// Mark for removal
 			n.Data = "removed"
@@ -95,8 +100,23 @@ func cleanAttributes(n *html.Node) {
 
 // Properties to strip from inline styles (colors, backgrounds, fonts, etc.)
 var stripStyleProps = regexp.MustCompile(
-	`(?i)(background[\w-]*|color|font-family|font-size|text-shadow|box-shadow|border[\w-]*|outline[\w-]*)\s*:[^;]*;?`,
+	`(?i)(background[\w-]*|color|font[\w-]*|text-shadow|box-shadow|border[\w-]*|outline[\w-]*|line-height|letter-spacing|word-spacing|text-indent|zoom|text-size-adjust|-\w+-text-size-adjust|mso-[\w-]*)\s*:[^;]*;?`,
 )
+
+// unwrapNode replaces a node with its children in the parent tree.
+func unwrapNode(n *html.Node) {
+	parent := n.Parent
+	if parent == nil {
+		return
+	}
+	// Move all children before this node
+	for n.FirstChild != nil {
+		child := n.FirstChild
+		n.RemoveChild(child)
+		parent.InsertBefore(child, n)
+	}
+	parent.RemoveChild(n)
+}
 
 func sanitizeStyle(style string) string {
 	cleaned := stripStyleProps.ReplaceAllString(style, "")

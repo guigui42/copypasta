@@ -43,9 +43,9 @@ func sanitizeNode(n *html.Node) {
 		}
 	}
 
-	// Strip text nodes that are just emoji
+	// Strip emoji from text nodes
 	if n.Type == html.TextNode {
-		n.Data = stripStandaloneEmoji(n.Data)
+		n.Data = stripAllEmoji(n.Data)
 	}
 
 	// Clean style attributes on elements
@@ -107,14 +107,4 @@ func sanitizeStyle(style string) string {
 		return ""
 	}
 	return cleaned
-}
-
-// stripStandaloneEmoji removes emoji characters that appear alone (not within text).
-var emojiRe = regexp.MustCompile(`^[\s]*[\x{1F300}-\x{1FAF8}\x{2600}-\x{27BF}\x{FE00}-\x{FE0F}\x{200D}\x{20E3}\x{E0020}-\x{E007F}✅❌⚠📷🔗💡🎯🚀✓✔☑☐📌📝🔒🔑📘]+[\s]*$`)
-
-func stripStandaloneEmoji(s string) string {
-	if emojiRe.MatchString(s) {
-		return ""
-	}
-	return s
 }

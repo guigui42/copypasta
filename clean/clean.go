@@ -14,7 +14,8 @@ func Clean(input string) string {
 	s = removeZeroWidthChars(s)
 	s = normalizeBullets(s)
 	s = normalizeArrows(s)
-	s = stripEmojiPrefixes(s)
+	s = stripAllEmoji(s)
+	s = collapseSpaces(s)
 	s = trimTrailingWhitespace(s)
 	s = collapseBlankLines(s)
 	s = strings.TrimSpace(s)
@@ -62,47 +63,18 @@ func normalizeArrows(s string) string {
 	return strings.ReplaceAll(s, "→", "->")
 }
 
-// stripEmojiPrefixes removes leading emoji from lines (e.g., "✅ Text" → "Text").
-func stripEmojiPrefixes(s string) string {
-	lines := strings.Split(s, "\n")
-	for i, line := range lines {
-		lines[i] = stripLeadingEmoji(line)
-	}
-	return strings.Join(lines, "\n")
-}
-
-func stripLeadingEmoji(line string) string {
-	trimmed := strings.TrimLeftFunc(line, unicode.IsSpace)
-	if trimmed == "" {
-		return line
-	}
-	leadingSpaces := line[:len(line)-len(trimmed)]
-
-	runes := []rune(trimmed)
-	idx := 0
-	stripped := false
-	for idx < len(runes) {
-		r := runes[idx]
+// stripAllEmoji removes emoji characters from all positions in the text.
+func stripAllEmoji(s string) string {
+	return strings.Map(func(r rune) rune {
 		if isEmojiLike(r) {
-			idx++
-			stripped = true
-			continue
+			return -1
 		}
-		// Skip variation selectors and ZWJ after emoji
-		if r == '\uFE0F' || r == '\uFE0E' || r == '\u200D' {
-			idx++
-			continue
+		// Drop variation selectors (they only modify emoji presentation)
+		if r == '\uFE0F' || r == '\uFE0E' {
+			return -1
 		}
-		break
-	}
-	if stripped {
-		rest := strings.TrimLeftFunc(string(runes[idx:]), unicode.IsSpace)
-		if rest == "" {
-			return leadingSpaces
-		}
-		return leadingSpaces + rest
-	}
-	return line
+		return r
+	}, s)
 }
 
 func isEmojiLike(r rune) bool {
@@ -128,6 +100,25 @@ func isEmojiLike(r rune) bool {
 		return true
 	}
 	return false
+}
+
+// collapseSpaces reduces runs of multiple spaces to one within line content,
+// preserving leading indentation.
+var multiSpaceRe = regexp.MustCompile(`  +`)
+
+func collapseSpaces(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		trimmed := strings.TrimLeftFunc(line, unicode.IsSpace)
+		if trimmed == "" {
+			lines[i] = line
+			continue
+		}
+		indent := line[:len(line)-len(trimmed)]
+		cleaned := strings.TrimSpace(multiSpaceRe.ReplaceAllString(trimmed, " "))
+		lines[i] = indent + cleaned
+	}
+	return strings.Join(lines, "\n")
 }
 
 // trimTrailingWhitespace removes trailing spaces/tabs from each line.

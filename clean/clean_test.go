@@ -80,19 +80,40 @@ func TestNormalizeBullets(t *testing.T) {
 	}
 }
 
-func TestStripEmojiPrefixes(t *testing.T) {
+func TestStripAllEmoji(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{
-		{"✅ Enterprise owner", "Enterprise owner"},
-		{"📷 Screenshot here", "Screenshot here"},
+		{"✅ Enterprise owner", " Enterprise owner"},
+		{"📷 Screenshot here", " Screenshot here"},
 		{"Normal text", "Normal text"},
-		{"  ✅ Indented emoji", "  Indented emoji"},
+		{"  ✅ Indented emoji", "   Indented emoji"},
+		{"📘 Getting Started", " Getting Started"},
+		{"See the 📘 docs for details", "See the  docs for details"},
+		{"Hello 🚀 World 💡 End", "Hello  World  End"},
 	}
 	for _, c := range cases {
-		got := stripLeadingEmoji(c.in)
+		got := stripAllEmoji(c.in)
 		if got != c.want {
-			t.Errorf("stripLeadingEmoji(%q) = %q, want %q", c.in, got, c.want)
+			t.Errorf("stripAllEmoji(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestCollapseSpaces(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{" Docs: link", " Docs: link"},
+		{"See the  docs for details", "See the docs for details"},
+		{"Hello  World  End", "Hello World End"},
+		{"   leading indent  two", "   leading indent two"},
+		{"normal text", "normal text"},
+	}
+	for _, c := range cases {
+		got := collapseSpaces(c.in)
+		if got != c.want {
+			t.Errorf("collapseSpaces(%q) = %q, want %q", c.in, got, c.want)
 		}
 	}
 }
